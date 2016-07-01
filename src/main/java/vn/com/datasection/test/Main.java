@@ -1,16 +1,34 @@
 package vn.com.datasection.test;
 
-import java.io.File;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
+import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-import vn.com.datasection.file.FileUtils;
+
 
 public class Main {
-
+    @SuppressWarnings("deprecation")
     public static void main(String[] args) {
-        for (File file : FileUtils.listFilesRecusive("/data/hoanghh/tmp/chientd/fujisu/3th/", "xz", true)) {
-            System.out.println(file.getAbsolutePath());
+        
+        Date start = new Date();
+        Date end = new Date();
+        Period p = new Period(start, end);
+        p.end().setYear(93);
+        System.out.println(p);
+        try {
+            synchronized (p) {
+                p.wait(12);
+            }
+            
+
+            System.out.println(System.nanoTime());
+            System.out.println(System.currentTimeMillis());
+            ConcurrentMap<String, String> d = new ConcurrentHashMap<>();
+        } catch (InterruptedException e) {
+            // log.error("unknown exception", e);
+            e.printStackTrace();
         }
-
     }
-
 }

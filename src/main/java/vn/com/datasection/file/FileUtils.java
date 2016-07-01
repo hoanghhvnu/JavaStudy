@@ -6,7 +6,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class FileUtils {
 
@@ -21,221 +24,165 @@ public class FileUtils {
             while ((line = br.readLine()) != null) {
                 content.add(line);
             } // end while
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        } // end try
+        }
 
         return content;
     } // end method
 
-    public static List<File> listFiles(String directoryPath) {
+    public static File[] listFiles(String directoryPath) {
         return listFiles(new File(directoryPath));
     }
 
-    public static List<File> listFiles(File directory) {
-        List<File> files = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.isFile() && !file.isHidden()) {
-                files.add(file);
-            } // end if
-        } // end for
-
-        return files;
-    } // end method
-
-    /**
-     * List all file in directory with special extension
-     * 
-     * @param directoryPath
-     * @param fileExtension
-     * @return Array of file satisfy
-     */
-    public static List<File> listFiles(String directoryPath, String fileExtension) {
-        return listFiles(new File(directoryPath), fileExtension);
+    public static File[] listFiles(File directory) {
+        return directory.listFiles();
     }
 
-    /**
-     * List all file in directory with special extension
-     * 
-     * @param directory
-     * @param fileExtension
-     * @return Array of file satisfy
-     */
-    public static List<File> listFiles(File directory, String fileExtension) {
-        List<File> files = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.isFile() && !file.isHidden() && file.getName().endsWith(fileExtension)) {
-                files.add(file);
+    public static List<File> listFileRecursive(String path) {
+        return listFileRecursive(new File(path));
+    }
+
+    public static List<File> listFileRecursive(File directory) {
+        List<File> result = new ArrayList<>();
+        File[] listFileLevel0 = directory.listFiles();
+        for (File file : listFileLevel0) {
+            if (file.isFile()) {
+                result.add(file);
+            } else if (file.isDirectory()) {
+                result.addAll(listFileRecursive(file));
             } // end if
         } // end for
 
-        return files;
+        return result;
     } // end method
 
-    /**
-     * List all file in directory with specify extension
-     * 
-     * @param directoryPath
-     * @param fileExtension
-     * @param isInvert
-     *            return only file no have specify extension
-     * @return
-     */
-    public static List<File> listFiles(String directoryPath, String fileExtension, boolean isInvert) {
-        return listFiles(new File(directoryPath), fileExtension, isInvert);
-    } // end method
+    public static Set<File> listFileRecursiveToSet(String path) {
+        return listFileRecursiveToSet(new File(path));
+    }
 
-    /**
-     * List all file with specify extension
-     * 
-     * @param directory
-     * @param fileExtension
-     * @param isInvert
-     *            return all file not have specify extension
-     * @return
-     */
-    public static List<File> listFiles(File directory, String fileExtension, boolean isInvert) {
-        if (isInvert == false)
-            return listFiles(directory, fileExtension);
-
-        List<File> files = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.isFile() && !file.isHidden() && file.getName().endsWith(fileExtension)) {
-                continue;
-            } // end if
-            files.add(file);
-        } // end for
-
-        return files;
-    } // end method
-
-    /**
-     * List all file inside directory recursive
-     * 
-     * @param directoryPath
-     * @return list file
-     */
-    public static List<File> listFilesRecusive(String directoryPath) {
-        return listFilesRecusive(new File(directoryPath));
-    } // end method
-
-    /**
-     * List all file inside directory recursive
-     * 
-     * @param directory
-     * @return
-     */
-    public static List<File> listFilesRecusive(File directory) {
-        List<File> files = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.isFile() && !file.isHidden()) {
-                files.add(file);
-            } else if (file.isDirectory() && !file.isHidden()) {
-                files.addAll(listFilesRecusive(file));
+    public static Set<File> listFileRecursiveToSet(File directory) {
+        Set<File> result = new TreeSet<>();
+        File[] listFileLevel0 = directory.listFiles();
+        for (File file : listFileLevel0) {
+            if (file.isFile()) {
+                result.add(file);
+            } else if (file.isDirectory()) {
+                result.addAll(listFileRecursiveToSet(file));
             } // end if
         } // end for
 
-        return files;
+        return result;
     } // end method
+    
+    public static Set<File> listFileRecursiveToSet(String path, String endWith) {
+        return listFileRecursiveToSet(new File(path), endWith);
+    }
 
-    /**
-     * List all file in directory with specify extension
-     * 
-     * @param directoryPath
-     * @param fileExtension
-     * @return
-     */
-    public static List<File> listFilesRecusive(String directoryPath, String fileExtension) {
-        return listFilesRecusive(new File(directoryPath), fileExtension);
-    } // end method
-
-    /**
-     * List all file in directory with specify extension
-     * 
-     * @param directory
-     * @param fileExtension
-     * @return List file
-     */
-    public static List<File> listFilesRecusive(File directory, String fileExtension) {
-        List<File> files = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.isFile() && !file.isHidden() && file.getName().endsWith(fileExtension)) {
-                files.add(file);
-            } else if (file.isDirectory() && !file.isHidden()) {
-                files.addAll(listFilesRecusive(file, fileExtension));
+    public static Set<File> listFileRecursiveToSet(File directory, String endWith) {
+        Set<File> result = new TreeSet<>();
+        File[] listFileLevel0 = directory.listFiles();
+        for (File file : listFileLevel0) {
+            if (file.isFile() && file.getName().endsWith(endWith)) {
+                result.add(file);
+            } else if (file.isDirectory()) {
+                result.addAll(listFileRecursiveToSet(file));
             } // end if
         } // end for
 
-        return files;
+        return result;
     } // end method
 
-    /**
-     * List all file in directory with specify extension
-     * 
-     * @param directoryPath
-     * @param fileExtension
-     * @param isInvert
-     *            return all file not have specify extension
-     * @return
-     */
-    public static List<File> listFilesRecusive(String directoryPath, String fileExtension, boolean isInvert) {
-        return listFilesRecusive(new File(directoryPath), fileExtension, isInvert);
+    public static List<File> listFileRecursive(String path, String pattern) {
+        return listFileRecursive(new File(path), pattern);
     } // end method
 
-    /**
-     * List all file in directory with specify extension
-     * 
-     * @param directory
-     * @param fileExtension
-     * @param isInvert
-     *            return all file not have specify extension
-     * @return
-     */
-    public static List<File> listFilesRecusive(File directory, String fileExtension, boolean isInvert) {
-        if (isInvert == false)
-            listFilesRecusive(directory, fileExtension);
-
-        List<File> files = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.isFile() && !file.isHidden()) {
-                if (file.getName().endsWith(fileExtension)) {
-                    continue;
-                } else {
-                    files.add(file);
-                } // end if check extension
-            } else if (file.isDirectory() && !file.isHidden()) {
-                files.addAll(listFilesRecusive(file, fileExtension, isInvert));
+    public static List<File> listFileRecursive(File directory, String pattern) {
+        List<File> result = new ArrayList<>();
+        File[] listFileLevel0 = directory.listFiles();
+        for (File file : listFileLevel0) {
+            if (file.isFile() && file.getName().endsWith(pattern)) {
+                result.add(file);
+            } else if (file.isDirectory()) {
+                result.addAll(listFileRecursive(file));
             } // end if
         } // end for
 
-        return files;
+        return result;
     } // end method
 
-    /**
-     * write String array to file
-     * 
-     * @param data
-     * @param path
-     */
     public static void write(String[] data, String path) {
         write(data, new File(path));
-    } // end method
+    }
 
-    /**
-     * Write string to file
-     * 
-     * @param data
-     * @param file
-     */
     public static void write(String[] data, File file) {
         try (FileWriter fw = new FileWriter(file)) {
             for (String line : data) {
                 fw.write(line + "\n");
-            } // end for
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
-        } // end try
+        }
+    }
+
+    public static void write(Collection<String> data, String path) {
+        write(data, new File(path));
+    }
+
+    public static void write(Collection<String> data, File file) {
+        try (FileWriter fw = new FileWriter(file)) {
+            for (String line : data) {
+                fw.write(line + "\n");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void writeSpecial(Collection<String> data, String file) {
+        Collection<String> sub = new ArrayList<>();
+        int i = 0;
+        for (String s : data) {
+            sub.add(s);
+            
+            if (sub.size() == 500 || i == data.size() - 1) {
+                write(sub, file + "." + String.valueOf(i / 500));
+                sub = null;
+                sub = new ArrayList<>();
+            }
+            i++;
+        }
+        
+    }
+
+    public static void write(Set<String> data, String path) {
+        write(data, new File(path));
+    }
+
+    public static void write(Set<String> data, File file) {
+        try (FileWriter fw = new FileWriter(file)) {
+            for (String line : data) {
+                fw.write(line + "\n");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void append(String data, String path) {
+        try (FileWriter fw = new FileWriter(path, true)) {
+            fw.append(data + "\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    } // end append
+
+    public static boolean mkdirs(String path) {
+        File dir = new File(path);
+
+        return dir.mkdirs();
     } // end method
 } // end class
